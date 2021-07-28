@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, { useState, useEffect } from 'react'
 import { Container, Row, Col } from 'react-bootstrap'
 
 import NavbarAdmin from '../components/NavbarAdmin'
@@ -7,12 +7,28 @@ import Chat from '../components/complain/Chat'
 
 import dataContact from '../fakeData/contact'
 
+// import socket.io-client 
+import {io} from 'socket.io-client'
+
+// initial variable outside socket
+let socket
 export default function ComplainAdmin() {
     const [contact, setContact] = useState(null)
 
     const title = "Complain admin"
     document.title = 'DumbMerch | ' + title
 
+    useEffect(() =>{
+        socket = io('http://localhost:5000', {
+            auth: {
+                token: localStorage.getItem('token')
+            }
+        })
+
+        return () => {
+            socket.disconnect();
+        }
+    }, [])
     return (
         <>
             <NavbarAdmin title={title} />
