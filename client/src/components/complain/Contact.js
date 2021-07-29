@@ -18,7 +18,7 @@ export default function Contact({ dataContact, clickContact, contact }) {
               }}
             >
               <img
-                src={item.image || default_profile}
+                src={item.profile?.image || default_profile}
                 className="rounded-circle me-2 img-contact"
                 alt="user avatar"
               />

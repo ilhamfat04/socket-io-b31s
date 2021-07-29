@@ -68,6 +68,7 @@ export default function Profile() {
                 <img
                   src={profile?.image ? profile.image : imgBlank}
                   className="img-fluid rounded"
+                  alt="profile"
                 />
               </Col>
               <Col md="6">
