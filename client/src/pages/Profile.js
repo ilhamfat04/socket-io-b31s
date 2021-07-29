@@ -36,7 +36,7 @@ export default function Profile() {
           Authorization: "Basic " + localStorage.token,
         },
       };
-      const response = await api.get("/profile", config);
+      const response = await api.get(`/user/${state.user.id}`, config);
       return response.data;
     }
   );

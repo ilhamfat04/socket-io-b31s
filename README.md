@@ -8,11 +8,11 @@ To initialize connection between client and server, we can add code like this:
 ```javascript
 const socketIo = (io) => {
  io.on('connection', (socket) => {
-   console.log('client connect:', socket.id)
+   console.log('client connect:', socket.id);
  })
 }
 
-module.exports = socketIo;
+module.exports = socketIo
 ```
 
 * src/index.js
@@ -22,7 +22,7 @@ const io = new Server(server, {
    origin: 'http://localhost:3000' // define client origin if both client and server have different origin
  }
 })
-require('./src/socket')(io);
+require('./src/socket')(io)
 ```
 
 
@@ -35,14 +35,10 @@ let socket
 ...
 // connect to server in useEffect function
    useEffect(() =>{
-       socket = io('http://localhost:5000', {
-           auth: {
-               token: localStorage.getItem('token')
-           }
-       })
+       socket = io('http://localhost:5000')
 
        return () => {
-           socket.disconnect();
+           socket.disconnect()
        }
    }, [])
 ...

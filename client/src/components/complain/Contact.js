@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React from "react"
 
 export default function Contact({ dataContact, setContact, contact }) {
   const clickContact = (id) => {
     const data = dataContact.find((item) => item.id == id);
-    setContact(data);
-    // console.log(data)
+    setContact(data)
   };
 
   return (
@@ -18,7 +17,7 @@ export default function Contact({ dataContact, setContact, contact }) {
             clickContact(item.id);
           }}
         >
-          <img src={item.img} className="rounded-circle me-2 img-contact" />
+          <img src={item.img} className="rounded-circle me-2 img-contact" alt="user avatar"/>
           <div className="pt-2">
             <ul className="ps-0 text-contact">
               <li>{item.name}</li>
