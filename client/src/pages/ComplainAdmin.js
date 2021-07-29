@@ -30,7 +30,7 @@ export default function ComplainAdmin() {
     const loadContacts = () => {
         socket.emit("load customer contacts")
         socket.on("customer contacts", (data) => {
-            // filter just customers that have message with admin
+            // filter just customers
             let dataContacts = data.filter(item => item.status !== "admin")
             
             // manipulate customers to add message property
