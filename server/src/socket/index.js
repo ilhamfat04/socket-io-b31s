@@ -1,5 +1,5 @@
-// import model
-const {chat, user} = require("../../models");
+// import models
+const {chat, user, profile} = require("../../models")
 
 const socketIo = (io) => {
   io.on('connection', (socket) => {
@@ -9,6 +9,15 @@ const socketIo = (io) => {
     socket.on("load admin contact", async () => {
       try {
         const adminContact = await user.findOne({
+          include: [
+            {
+              model: profile,
+              as: "profile",
+              attributes: {
+                exclude: ["createdAt", "updatedAt"],
+              },
+            },
+          ],
           where: {
             status: "admin"
           },
@@ -17,17 +26,24 @@ const socketIo = (io) => {
           },
         });
 
-        socket.emit("admin contact", adminContact);
+        socket.emit("admin contact", adminContact)
       } catch (err) {
-        console.log(err);
+        console.log(err)
       }
     });
 
     // define listener on event load customer contact
     socket.on("load customer contacts", async () => {
       try {
-        const customerContacts = await user.findAll({
+        let customerContacts = await user.findAll({
           include: [
+            {
+              model: profile,
+              as: "profile",
+              attributes: {
+                exclude: ["createdAt", "updatedAt"],
+              },
+            },
             {
               model: chat,
               as: "recipientMessage",
@@ -48,9 +64,15 @@ const socketIo = (io) => {
           },
         });
 
-        socket.emit("customer contacts", customerContacts);
+        customerContacts = JSON.parse(JSON.stringify(customerContacts))
+        customerContacts = customerContacts.map(item => ({
+          ...item,
+          image: item.image ? process.env.PATH_FILE + item.image : null
+        }))
+        
+        socket.emit("customer contacts", customerContacts)
       } catch (err) {
-        console.log(err);
+        console.log(err)
       }
     })
   })

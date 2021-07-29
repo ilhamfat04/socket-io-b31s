@@ -17,7 +17,7 @@ exports.getProfile = async (req, res) => {
 
     data = {
       ...data,
-      image: process.env.PATH_FILE + data.image,
+      image: data.image ? process.env.PATH_FILE + data.image : null,
     };
 
     res.send({
