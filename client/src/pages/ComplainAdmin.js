@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Row, Col } from 'react-bootstrap'
 
 import NavbarAdmin from '../components/NavbarAdmin'
 
-// import contact component
+// import components
+import { Container, Row, Col } from 'react-bootstrap'
 import Contact from '../components/complain/Contact'
 
 // import socket.io-client 
