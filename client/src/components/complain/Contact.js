@@ -22,11 +22,11 @@ export default function Contact({ dataContact, clickContact, contact }) {
                 className="rounded-circle me-2 img-contact"
                 alt="user avatar"
               />
-              <div className="pt-2">
-                <ul className="ps-0 text-contact">
-                  <li>{item.name}</li>
-                  <li className="text-contact-chat mt-1">{item.message}</li>
-                </ul>
+              <div className="ps-1 text-contact d-flex flex-column justify-content-around">
+                <p className="mb-0">{item.name}</p>
+                <p className="text-contact-chat mt-1 mb-0">
+                  {item.message}
+                </p>
               </div>
             </div>
           ))}
