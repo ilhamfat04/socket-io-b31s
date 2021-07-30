@@ -10,7 +10,8 @@ const {Op} = require("sequelize")
 const connectedUser = {}
 const socketIo = (io) => {
 
-  // create middlewares to prevent client without token to access socket server
+  // create middlewares before connection event
+  // to prevent client access socket server without token
   io.use((socket, next) => {
     if (socket.handshake.auth && socket.handshake.auth.token ) {
       next();
@@ -85,12 +86,17 @@ const socketIo = (io) => {
           attributes: {
             exclude: ["createdAt", "updatedAt", "password"],
           },
-        });
+        })
 
         customerContacts = JSON.parse(JSON.stringify(customerContacts))
-        customerContacts = customerContacts.map(item => ({
+        customerContacts = customerContacts.map((item) => ({
           ...item,
-          image: item.image ? process.env.PATH_FILE + item.image : null
+          profile: {
+            ...item.profile,
+            image: item.profile?.image
+              ? process.env.PATH_FILE + item.profile?.image
+              : null,
+          },
         }))
         
         socket.emit("customer contacts", customerContacts)
@@ -101,15 +107,14 @@ const socketIo = (io) => {
 
     // define listener on event load messages
     socket.on("load messages", async (payload) => {
-      console.log("load messages", payload)
       try {
-        const token = socket.handshake.auth.token;
+        const token = socket.handshake.auth.token
 
-        const tokenKey = process.env.TOKEN_KEY;
-        const verified = jwt.verify(token, tokenKey);
+        const tokenKey = process.env.TOKEN_KEY
+        const verified = jwt.verify(token, tokenKey)
 
-        const idRecipient = payload; // catch recipient id sent from client
-        const idSender = verified.id; //id user
+        const idRecipient = payload // catch recipient id sent from client
+        const idSender = verified.id //id user
 
         const data = await chat.findAll({
           where: {
@@ -136,26 +141,27 @@ const socketIo = (io) => {
               },
             },
           ],
+          order: [['createdAt', 'ASC']],
           attributes: {
             exclude: ["createdAt", "updatedAt", "idRecipient", "idSender"],
-          },
-        });
+          }
+        })
 
-        socket.emit("messages", data);
+        socket.emit("messages", data)
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
-    });
+    })
 
     // define listener on event send message
     socket.on("send message", async (payload) => {
       try {
-        const token = socket.handshake.auth.token;
+        const token = socket.handshake.auth.token
         
-        const tokenKey = process.env.TOKEN_KEY;
-        const verified = jwt.verify(token, tokenKey);
+        const tokenKey = process.env.TOKEN_KEY
+        const verified = jwt.verify(token, tokenKey)
         
-        const idSender = verified.id; //id user
+        const idSender = verified.id //id user
         const {
           message,
           idRecipient
@@ -172,7 +178,7 @@ const socketIo = (io) => {
       } catch (error) {
         console.log(error)
       }
-    });
+    })
 
     socket.on("disconnect", () => {
       console.log("client disconnected", socket.id)
