@@ -9,7 +9,7 @@ const socketIo = (io) => {
     if (socket.handshake.auth && socket.handshake.auth.token ) {
       next();
     } else {
-      next(new Error("Not Authorized"));
+      next(new Error("Not Authorized"))
     }
   });
 
@@ -89,4 +89,4 @@ const socketIo = (io) => {
   })
 }
 
-module.exports = socketIo;
+module.exports = socketIo

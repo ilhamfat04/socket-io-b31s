@@ -1,39 +1,26 @@
-# Socket.io Events - contacts
+# Socket.io Middlewares
 
-To build our chat feature, there is two things that we need to define, contacts and messages
+Socket.io provide API to let us create middlewares. To create middlewares, we can call `io.use()` method before connection event and make validation on handshake.
 
-In Socket.io, we can use method `on()` and `emit()` to define events
-* `on()`    : Method for listen an event that have been emitted. If the event triggered, the callback function will be executed.
-* `emit()`  : Method for emit an event. So, this is useful if you want to send data.
+Note: handshake is the property that store object with options value that sent from client
 
-We define contacts events inside 'connection' events
-
-##For example usage
+## For example usage
 
 ### Server
 ```javascript
 ... // import models
 const socketIo = (io) => {
-  io.on('connection', (socket) => {
-    // define listener on event “load admin contact”
-    socket.on("load admin contact", async () => {
-      try {
-        const adminContact = await user.findOne({
-          where: {
-            status: "admin"
-          },
-          attributes: {
-            exclude: ["createdAt", "updatedAt", "password"],
-          },
-        });
-    
-      // emit event to send admin data on event “admin contact”
-      socket.emit("admin contact", adminContact)
-      } catch (err) {
-        console.log(err)
-      }
-    })
-  })
+  ...
+  // create middlewares before connection event
+  // to prevent client access socket server without token
+  io.use((socket, next) => {
+    if (socket.handshake.auth && socket.handshake.auth.token ) {
+      next();
+    } else {
+      next(new Error("Not Authorized"));
+    }
+  });
+  ... //connection
 }
 
 module.exports = socketIo
@@ -41,28 +28,26 @@ module.exports = socketIo
 
 ### Client
 ```javascript
-// initial variable outside component
-let socket
 ...
-// connect to server in useEffect function
-  useEffect(() =>{
-      socket = io('http://localhost:5000')
-      loadContacts()
-
-      return () => {
-          socket.disconnect()
+useEffect(() =>{
+  socket = io('http://localhost:5000', {
+      auth: {
+          token: localStorage.getItem("token") // we must set options to get access to socket server
       }
-  }, [])
+  })
+  loadContacts()
 
-  const loadContact = () => {
-    // emit event to load admin contact
-    socket.emit("load admin contact")
-
-    // listen event to get admin contact
-    socket.on("admin contact", (data) => {
-        // do whatever to the data sent from server
-    })
+  // listen error sent from server
+  socket.on("connect_error", (err) => {
+      console.error(err.message); // not authorized
+  });
+  
+  return () => {
+      socket.disconnect()
   }
+}, [])
 ...
 
 ```
+
+[Socket.io middlewares](https://socket.io/docs/v3/middlewares/)
