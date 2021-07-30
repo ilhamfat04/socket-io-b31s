@@ -3,6 +3,16 @@ const {chat, user, profile} = require("../../models")
 
 const socketIo = (io) => {
 
+  // create middlewares before connection event
+  // to prevent client access socket server without token
+  io.use((socket, next) => {
+    if (socket.handshake.auth && socket.handshake.auth.token ) {
+      next();
+    } else {
+      next(new Error("Not Authorized"));
+    }
+  });
+
   io.on('connection', (socket) => {
     console.log('client connect: ', socket.id)
 
