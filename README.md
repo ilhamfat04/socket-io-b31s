@@ -47,7 +47,7 @@ let socket
 // connect to server in useEffect function
   useEffect(() =>{
       socket = io('http://localhost:5000')
-      loadContacts()
+      loadContact()
 
       return () => {
           socket.disconnect()
