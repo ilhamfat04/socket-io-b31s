@@ -20,16 +20,11 @@ export default function Complain() {
 
     useEffect(() =>{
         socket = io('http://localhost:5000', {
-            auth: {
-                token: localStorage.getItem("token")
-            }
+            // code here
         })
         loadContact()
 
-        // listen error sent from server
-        socket.on("connect_error", (err) => {
-            console.error(err.message); // not authorized
-        });
+        // code here
 
         return () => {
             socket.disconnect()
