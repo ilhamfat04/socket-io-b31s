@@ -78,6 +78,10 @@ const socketIo = (io) => {
         console.log(err)
       }
     })
+
+    socket.on("disconnect", () => {
+      console.log("client disconnect")
+    })
   })
 }
 
