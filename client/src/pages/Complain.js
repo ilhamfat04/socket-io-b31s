@@ -1,9 +1,9 @@
 // import useContext hook
 import React, { useState, useEffect, useContext } from 'react'
-import { Container, Row, Col } from 'react-bootstrap'
 
 import Navbar from '../components/Navbar'
 
+import { Container, Row, Col } from 'react-bootstrap'
 import Contact from '../components/complain/Contact'
 // import chat component 
 import Chat from '../components/complain/Chat'

@@ -1,14 +1,8 @@
-# Socket.io Events - contacts
+# Socket.io Events - Messages
 
-To build our chat feature, there is two things that we need to define, contacts and messages
+In thi branch, we define socket events for handling messages 
 
-In Socket.io, we can use method `on()` and `emit()` to define events
-* `on()`    : Method for listen an event that have been emitted. If the event triggered, the callback function will be executed.
-* `emit()`  : Method for emit an event. So, this is useful if you want to send data.
-
-We define contacts events inside 'connection' events
-
-##For example usage
+## For example usage
 
 ### Server
 ```javascript
@@ -16,21 +10,50 @@ We define contacts events inside 'connection' events
 const socketIo = (io) => {
   io.on('connection', (socket) => {
     // define listener on event “load admin contact”
-    socket.on("load admin contact", async () => {
+    socket.on("load messages", async (payload) => {
       try {
-        const adminContact = await user.findOne({
+        const token = socket.handshake.auth.token
+
+        const tokenKey = process.env.TOKEN_KEY
+        const verified = jwt.verify(token, tokenKey)
+
+        const idRecipient = payload // catch recipient id sent from client
+        const idSender = verified.id //id user
+
+        const data = await chat.findAll({
           where: {
-            status: "admin"
+            idSender: {
+              [Op.or]: [idRecipient, idSender]
+            },
+            idRecipient: {
+              [Op.or]: [idRecipient, idSender]
+            }
           },
+          include: [
+            {
+              model: user,
+              as: "recipient",
+              attributes: {
+                exclude: ["createdAt", "updatedAt", "password"],
+              },
+            },
+            {
+              model: user,
+              as: "sender",
+              attributes: {
+                exclude: ["createdAt", "updatedAt", "password"],
+              },
+            },
+          ],
+          order: [['createdAt', 'ASC']],
           attributes: {
-            exclude: ["createdAt", "updatedAt", "password"],
-          },
-        });
-    
-      // emit event to send admin data on event “admin contact”
-      socket.emit("admin contact", adminContact)
-      } catch (err) {
-        console.log(err)
+            exclude: ["createdAt", "updatedAt", "idRecipient", "idSender"],
+          }
+        })
+
+        socket.emit("messages", data)
+      } catch (error) {
+        console.log(error)
       }
     })
   })
@@ -41,28 +64,44 @@ module.exports = socketIo
 
 ### Client
 ```javascript
-// initial variable outside component
-let socket
 ...
 // connect to server in useEffect function
-  useEffect(() =>{
-      socket = io('http://localhost:5000')
-      loadContacts()
-
-      return () => {
-          socket.disconnect()
+useEffect(() =>{
+  socket = io('http://localhost:5000', {
+      auth: {
+          token: localStorage.getItem("token")
+      },
+      query: {
+          id: state.user.id
       }
-  }, [])
+  })
 
-  const loadContact = () => {
-    // emit event to load admin contact
-    socket.emit("load admin contact")
+  // define corresponding socket listener 
+  socket.on("new message", () => {
+    console.log("contact", contact)
+    console.log("triggered", contact?.id)
+    socket.emit("load messages", contact?.id)
+  })
+  
+  // listen error sent from server
+  socket.on("connect_error", (err) => {
+    console.error(err.message); // not authorized
+  });
 
-    // listen event to get admin contact
-    socket.on("admin contact", (data) => {
-        // do whatever to the data sent from server
-    })
+  loadContact()
+  loadMessages()
+
+  return () => {
+      socket.disconnect()
   }
+}, [messages])
+
+const loadMessages = () => {
+  // listen event to get admin contact
+  socket.on("messages", (data) => {
+      // do whatever to the data sent from server
+  })
+}
 ...
 
 ```

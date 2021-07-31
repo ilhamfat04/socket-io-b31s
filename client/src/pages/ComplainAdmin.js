@@ -1,9 +1,9 @@
 // import useContext hook
 import React, { useState, useEffect, useContext } from 'react'
-import { Container, Row, Col } from 'react-bootstrap'
 
 import NavbarAdmin from '../components/NavbarAdmin'
 
+import { Container, Row, Col } from 'react-bootstrap'
 import Contact from '../components/complain/Contact'
 // import chat component 
 import Chat from '../components/complain/Chat'
@@ -74,8 +74,8 @@ export default function ComplainAdmin() {
         socket.emit("load messages", data.id)
     }
 
-    const loadMessages = (value) => {
-        // define listener on event "messages"
+    const loadMessages = () => {
+        // define event listener for "messages"
         socket.on("messages", (data) => {
             // get data messages
             if (data.length > 0) {
@@ -86,8 +86,8 @@ export default function ComplainAdmin() {
                 setMessages(dataMessages)
             }
             loadContacts()
-            const chatMessagesElm = document.getElementById("chat-messages");
-            chatMessagesElm.scrollTop = chatMessagesElm?.scrollHeight;
+            const chatMessagesElm = document.getElementById("chat-messages")
+            chatMessagesElm.scrollTop = chatMessagesElm?.scrollHeight
         })
     }
 
