@@ -1,13 +1,8 @@
 // import models
 const {chat, user, profile} = require("../../models")
-// import jsonwebtoken
-const jwt = require("jsonwebtoken")
+// import here
 
-// import sequelize operator
-// https://sequelize.org/master/manual/model-querying-basics.html#operators
-const {Op} = require("sequelize")
-
-const connectedUser = {}
+// init variable here
 const socketIo = (io) => {
 
   // create middlewares before connection event
@@ -23,11 +18,7 @@ const socketIo = (io) => {
   io.on('connection', async (socket) => {
     console.log('client connect: ', socket.id)
     
-    // get user connected id
-    const userId = socket.handshake.query.id
-    
-    // save to connectedUser
-    connectedUser[userId] = socket.id
+    // code here
 
     // define listener on event load admin contact
     socket.on("load admin contact", async () => {
@@ -105,86 +96,13 @@ const socketIo = (io) => {
       }
     })
 
-    // define listener on event load messages
-    socket.on("load messages", async (payload) => {
-      try {
-        const token = socket.handshake.auth.token
-
-        const tokenKey = process.env.TOKEN_KEY
-        const verified = jwt.verify(token, tokenKey)
-
-        const idRecipient = payload // catch recipient id sent from client
-        const idSender = verified.id //id user
-
-        const data = await chat.findAll({
-          where: {
-            idSender: {
-              [Op.or]: [idRecipient, idSender]
-            },
-            idRecipient: {
-              [Op.or]: [idRecipient, idSender]
-            }
-          },
-          include: [
-            {
-              model: user,
-              as: "recipient",
-              attributes: {
-                exclude: ["createdAt", "updatedAt", "password"],
-              },
-            },
-            {
-              model: user,
-              as: "sender",
-              attributes: {
-                exclude: ["createdAt", "updatedAt", "password"],
-              },
-            },
-          ],
-          order: [['createdAt', 'ASC']],
-          attributes: {
-            exclude: ["createdAt", "updatedAt", "idRecipient", "idSender"],
-          }
-        })
-
-        socket.emit("messages", data)
-      } catch (error) {
-        console.log(error)
-      }
-    })
-
-    // define listener on event send message
-    socket.on("send message", async (payload) => {
-      try {
-        const token = socket.handshake.auth.token
-        
-        const tokenKey = process.env.TOKEN_KEY
-        const verified = jwt.verify(token, tokenKey)
-        
-        const idSender = verified.id //id user
-        const {
-          message,
-          idRecipient
-        } = payload // catch recipient id and message sent from client
-
-        await chat.create({
-          message,
-          idRecipient,
-          idSender
-        })
-
-        // emit to just sender and recipient default rooms by their socket id
-        io.to(socket.id).to(connectedUser[idRecipient]).emit("new message", idRecipient)
-      } catch (error) {
-        console.log(error)
-      }
-    })
+    // code here
 
     socket.on("disconnect", () => {
       console.log("client disconnected", socket.id)
-      delete connectedUser[userId]
+      // code here
     })
   })
 }
 
-module.exports = socketIo;
+module.exports = socketIo
