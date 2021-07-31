@@ -20,8 +20,7 @@ const io = new Server(server, {
   }
 })
 
-// import socket function and call with parameter io
-require('./src/socket')(io)
+// import here
 
 const port = 5000
 
